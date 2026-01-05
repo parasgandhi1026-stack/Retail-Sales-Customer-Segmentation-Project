@@ -1,0 +1,488 @@
+Create database Retail_db2;
+use  Retail_db2;
+
+
+CREATE TABLE Customers(
+Customer_id INT AUTO_INCREMENT PRIMARY KEY ,
+Customer_name Varchar(30),
+Gender enum("Male","Female","Other") Default "Male",
+City Varchar (100),
+Join_date DATE
+);
+INSERT INTO Customers(Customer_name,Gender,City,Join_date)values
+('Amit Sharma','Male','Mumbai','2023-02-10'),
+('Priya Singh','Female','Delhi','2024-01-05'),
+('Rahul Patel','Male','Mumbai','2022-11-20'),
+('Sneha Rao','Female','Pune','2023-06-12'),
+('Rakesh Kumar','Male','Bengaluru','2024-03-22'),
+('Anjali Mehta','Female','Chennai','2021-09-30'),
+('Vikram Desai','Male','Ahmedabad','2024-07-01'),
+('Kavita Joshi','Female','Mumbai','2023-12-15');
+
+
+
+
+CREATE TABLE Products (
+Product_id INT PRIMARY KEY AUTO_INCREMENT,
+Product_name VARCHAR(40),
+Category VARCHAR(40),
+Unit_price INT
+);
+
+INSERT INTO Products(Product_name,Category,Unit_price)values
+('Wireless Mouse','Accessories',499.00),
+('Bluetooth Headphones','Electronics',2499.00),
+('Water Bottle 1L','Home & Kitchen',199.00),
+('Notebook - A4','Stationery',49.00),
+('Office Chair','Furniture',5999.00),
+('LED Desk Lamp','Home & Kitchen',999.00),
+('USB-C Cable','Accessories',299.00),
+('Smartphone Case','Accessories',399.00);
+
+
+
+CREATE TABLE  Orders(
+Order_id  int AUTO_INCREMENT PRIMARY KEY,
+Customer_id int,
+Order_date date,
+ship_date date,
+Order_Status varchar(20),
+foreign key (Customer_id) references Customers(Customer_id)
+ON DELETE CASCADE
+ON UPDATE CASCADE
+);
+
+INSERT INTO Orders(Customer_id,Order_date,ship_date,Order_Status)values
+(1,'2024-01-15','2024-01-17','Shipped'),
+(2,'2024-02-05','2024-02-06','Shipped'),
+(3,'2024-02-20','2024-02-27','Delivered'),
+(4,'2024-03-10','2024-03-15','Delivered'),
+(1,'2024-03-25','2024-03-27','Shipped'),
+(5,'2024-04-02',NULL,'Processing'),
+(6,'2024-04-18','2024-04-20','Delivered'),
+(7,'2024-05-05','2024-05-09','Delivered'),
+(8,'2024-05-20','2024-05-22','Shipped'),
+(2,'2024-06-11','2024-06-13','Delivered'),
+(3,'2024-07-01','2024-07-06','Delivered'),
+(4,'2024-07-18','2024-07-22','Returned');
+
+
+
+
+create table order_Details(
+Detail_id int auto_increment primary key,
+Order_id int not null,
+product_id int,
+Quantity varchar(30),
+price int,
+Discount decimal(5,2),
+foreign key (order_id) references orders(order_id),
+foreign key (product_id) references products(product_id) 
+on delete cascade
+on update cascade 
+);
+
+INSERT INTO Order_details(Order_id,Product_id,Quantity,price,Discount)values
+(1,1,2,499.00,0.00),
+(1,4,5,49.00,0.00),
+(2,2,1,2499.00,10.00),
+(3,3,3,199.00,0.00),
+(3,7,2,299.00,0.00),
+(4,5,1,5999.00,5.00),
+(5,1,1,499.00,0.00),
+(5,8,2,399.00,0.00),
+(6,6,1,999.00,0.00),
+(7,2,1,2499.00,0.00),
+(7,3,2,199.00,0.00),
+(8,4,10,49.00,0.00),
+(9,1,3,499.00,0.00),
+(9,7,1,299.00,0.00),
+(10,2,2,2499.00,5.00),
+(11,5,1,5999.00,10.00),
+(12,2,1,2499.00,0.00),
+(12,8,1,399.00,0.00),
+(4,1,1,499.00,0.00),
+(2,4,2,49.00,0.00);
+
+select * from customers;
+select * from orders;
+select * from products;
+select * from order_details;
+
+select Product_name,max(Unit_price) as max_price from products group by Product_name order by max_price desc limit 1 offset 1;
+select Product_name,max(Unit_price) as max_price from  products group by Product_name order by max_price desc;
+
+select max(Unit_price) from products;
+select max(Unit_price) from products where Unit_price=(select max(Unit_price) from products);
+select max(Unit_price) from products where Unit_price<(select max(Unit_price) from products);
+select max(Unit_price) from products where Unit_price<(select max(Unit_price) from products 
+where Unit_price<(select max(Unit_price) from products));
+select max(Unit_price) from products where Unit_price=(select max(Unit_price) from products
+ where Unit_price<(select max(Unit_price) from products));
+
+  
+select  p.product_name,p.Unit_price,od.Quantity
+from products p
+join order_details od
+on p.product_id=od.product_id
+where Unit_price=(select max(Unit_price) from products);
+
+-- 1. List all customers from the city “Mumbai”.
+
+SELECT * FROM customers WHERE city = 'Mumbai';
+select * from customers where city = "Mumbai";
+
+-- 2. Show all products that have a price greater than ₹500.
+
+SELECT *FROM products WHERE Unit_price > 500;
+
+-- 3 . Count the total number of orders placed during the year 2024.
+-- Use the OrderDate column to filter orders from 1-Jan-2024 to 31-Dec-2024.
+
+Select count(*) as total_orders_2024 from orders where order_date  between '1_jan-2024' and '31-Dec-2024';
+SELECT COUNT(*) AS total_orders_2024 FROM orders WHERE Order_date BETWEEN '2024-01-01' AND '2024-12-31';
+
+-- 4 Get all unique product categories.
+-- From the products table, list distinct categories available in the store.
+
+SELECT DISTINCT category FROM products;
+select distinct category from products;
+
+-- 5 Display details of customers who joined after the year 2023.
+-- Filter customers based on JoinDate > '2023-12-31'.
+
+SELECT * FROM customers WHERE Join_date > '2023-12-31';
+select * from customers where join_date > '2023-12-31';
+
+-- 6 Show all orders whose status is “Shipped”.
+-- Retrieve order details where the order status is exactly Shipped
+
+SELECT * FROM orders WHERE Order_Status = 'Shipped';
+
+-- 7. Retrieve product name and price for all products Show all orders whose status is “Shipped”.
+-- Display only two fields: ProductName and Price.
+
+SELECT Product_name, Unit_price FROM products;
+
+-- 8. Display all orders sorted by newest to oldest.
+-- Sort the orders by Ordretail_db2erDate in descending order.
+
+select  * from orders order by Order_date desc;
+
+
+-- 9. Count total customers for each city (city-wise customer count).
+-- Group customers by City and count how many belong to each city.
+
+select City ,count(*) as Total_customers from customers group by City;
+
+-- 10. Show all purchases made by a specific customer (CustomerID = 101).
+-- Retrieve order + product details for customer ID 101 from Orders + OrderDetails.
+
+SELECT 
+    o.Order_id,
+    o.Order_date,
+    o.customer_id,
+    od.Product_id,
+    p.Product_name,
+    od.Quantity,
+    od.Price,
+    (od.Quantity * od.Price) AS TotalAmount
+FROM Orders o
+JOIN Order_details od 
+    ON o.Order_id = od.Order_id
+JOIN products p
+    ON od.Product_id = p.Product_id
+WHERE o.Customer_id = 101;
+
+-- 11. Calculate total sales amount for each order line (Quantity × Price).
+-- Return OrderID, ProductID, Quantity, Price, and computed TotalSales.
+
+SELECT Order_id,Product_id,Quantity,Price,(Quantity * Price) AS TotalSales FROM Order_details;
+
+-- 12. Find total sales generated by each product.
+-- Sum Quantity × Price grouped by product.
+
+select Product_id,sum(Quantity * Price) as TotalSales  From order_details group by Product_id ;
+SELECT 
+    Product_id,
+    SUM(Quantity * Price) AS TotalSales
+FROM Order_details
+GROUP BY Product_id;
+
+-- 13. Compute month-wise sales for the year 2024.
+-- Group sales by month using MONTH(OrderDate) filtered for 2024.
+
+SELECT 
+    MONTH(Order_date) AS MonthNumber,
+    SUM(Quantity * Price) AS TotalSales
+FROM Order_details od
+JOIN Orders o
+    ON od.Order_id = o.Order_id
+WHERE YEAR(o.Order_date) = 2024
+GROUP BY MONTH(Order_date)
+ORDER BY MonthNumber;
+
+-- 14. Identify the top 5 customers by total purchase value.
+-- Calculate each customer’s lifetime sales and fetch the top 5.
+
+SELECT 
+    o.Customer_id,
+    SUM(od.Quantity * od.Price) AS TotalPurchaseValue
+FROM Orders o
+JOIN Order_details od
+    ON o.Order_id = od.Order_id
+GROUP BY o.Customer_id
+ORDER BY TotalPurchaseValue DESC ;
+
+-- 15. Find the most frequently purchased product.
+-- Use COUNT of ProductID in OrderDetails to find the highest frequency.
+
+SELECT 
+    Product_id,
+    COUNT(Product_id) AS PurchaseFrequency
+FROM Order_details
+GROUP BY Product_id
+ORDER BY PurchaseFrequency DESC ;
+
+-- 16.Show all orders that took more than 3 days to ship.
+-- Calculate (ShipDate - OrderDate) > 3.
+
+select  *  from orders  where datediff (ship_date,order_date)>3;
+
+-- 17. Calculate the discount amount for each order line.
+-- Formula: Price × Quantity × Discount%
+
+SELECT 
+    order_id,
+    product_id
+    Price,
+    Quantity,
+    Discount,
+    (Price * Quantity * Discount) AS DiscountAmount
+FROM order_details;
+
+-- 19. Show the number of orders placed by each customer.
+-- Count orders grouped by CustomerID.
+
+SELECT Customer_id,COUNT(*) AS TotalOrders FROM Orders GROUP BY Customer_id ORDER BY TotalOrders DESC;
+
+-- 20. Identify product categories whose revenue exceeded ₹50,000.
+-- Sum revenue by category and filter revenues > 50k.
+
+SELECT Category,SUM(Price * Quantity) AS TotalRevenue FROM Order_details GROUP BY Category HAVING TotalRevenue > 50000;
+
+-- 21. Display the average discount applied for each product.
+-- Calculate average discount% grouped by ProductID.
+
+SELECT Product_id,AVG(Discount) AS AverageDiscount FROM Order_details GROUP BY Product_id;
+
+
+-- 22. Calculate customer lifetime value (total purchases).
+-- Sum all purchases of every customer up to the current date.
+
+SELECT o.Customer_id,SUM(od.Price * od.Quantity) AS LifetimeValue FROM Orders o JOIN Order_details od ON o.Order_id = od.Order_id
+GROUP BY o.Customer_id ORDER BY LifetimeValue DESC;
+
+
+
+select * from customers;
+select * from orders;
+select * from products;
+select * from order_details;
+ 
+
+-- 23. Find the top-selling product category by total revenue.
+-- Total revenue = SUM(Price × Quantity) grouped by category; pick highest.
+
+SELECT p.Category,SUM(od.Price * od.Quantity) AS TotalRevenue FROM order_details od JOIN products p
+ON od.product_id = p.product_id GROUP BY p.Category ORDER BY TotalRevenue DESC;
+
+.
+-- 24. Find customers with more than 1 order.
+
+SELECT customer_id,COUNT(order_id) AS total_orders
+FROM orders GROUP BY customer_id HAVING COUNT(order_id) > 1;
+
+
+-- 25. Identify high-value customers (total purchase > ₹1,00,000).
+-- Filter customers whose total revenue exceeds ₹1 lakh.
+
+SELECT o.customer_id,SUM(od.price * od.quantity) AS total_revenue
+FROM orders o
+JOIN order_details od
+    ON o.order_id = od.order_id
+GROUP BY o.customer_id
+HAVING SUM(od.price * od.quantity) > 100000
+ORDER BY total_revenue DESC;
+
+-- 26. Compare sales between 2023 and 2024.
+-- Compute total revenue for each year and compare.
+
+SELECT YEAR(o.order_date) AS sales_year,SUM(od.price * od.quantity) AS total_revenue
+FROM orders o
+JOIN order_details od
+    ON o.order_id = od.order_id
+WHERE YEAR(o.order_date) IN (2023, 2024)
+GROUP BY YEAR(o.order_date)
+ORDER BY sales_year;
+
+-- 27. Determine daily, weekly, and monthly sales trends.
+
+•	DATE(OrderDate)
+•	WEEK(OrderDate)
+•	MONTH(OrderDate)
+Group sales accordingly.
+SELECT 
+    DATE(o.order_date) AS sale_date,
+    SUM(od.price * od.quantity) AS total_sales
+FROM orders o
+JOIN order_details od
+    ON o.order_id = od.order_id
+GROUP BY DATE(o.order_date)
+ORDER BY sale_date;
+
+-- 28. Identify slow-moving products (low sales volume).
+-- Products with least total quantity sold.
+
+SELECT 
+    p.product_id,
+    p.product_name,
+    SUM(od.quantity) AS total_quantity_sold
+FROM products p
+JOIN order_details od
+    ON p.product_id = od.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_quantity_sold ASC;
+--- SELECT *
+FROM (
+    SELECT 
+        c.city,
+        c.customer_id,
+        c.customer_name,
+        SUM(o.order_amount) AS total_purchase,
+        RANK() OVER (
+            PARTITION BY c.city
+            ORDER BY SUM(o.order_amount) DESC
+        ) AS city_rank
+    FROM customers c
+    JOIN orders o 
+        ON c.customer_id = o.customer_id
+    GROUP BY 
+        c.city, 
+        c.customer_id, 
+        c.customer_name
+) t
+WHERE city_rank <= 3;
+
+-- 29. Show top 3 customers in each city using RANK() window function.
+-- Rank customers by purchase value within each city.
+SELECT
+    city,
+    customer_id,
+    total_purchase,
+    city_rank
+FROM (
+    SELECT
+        c.city,
+        c.customer_id,
+        SUM(od.price * od.quantity) AS total_purchase,
+        RANK() OVER (
+            PARTITION BY c.city
+            ORDER BY SUM(od.price * od.quantity) DESC
+        ) AS city_rank
+    FROM customers c
+    JOIN orders o
+        ON c.customer_id = o.customer_id
+    JOIN order_details od
+        ON o.order_id = od.order_id
+    GROUP BY c.city, c.customer_id
+) ranked_customers
+WHERE city_rank <= 3
+ORDER BY city, city_rank;
+
+-- 30. Calculate profit per order line:
+-- Formula: Profit = Price − (Price × Discount%)
+
+SELECT
+    order_id,
+    product_id,
+    price,
+    discount,
+    (price - (price * discount)) AS profit
+FROM order_details;
+
+-- 31. Calculate average order value (AOV) per customer.
+-- Total sales / number of orders for each customer.
+
+SELECT
+    customer_id,
+    SUM(order_sales) / COUNT(order_id) AS avg_order_value
+FROM (
+    SELECT
+        o.customer_id,
+        o.order_id,
+        SUM(od.price * od.quantity) AS order_sales
+    FROM orders o
+    JOIN order_details od
+        ON o.order_id = od.order_id
+    GROUP BY o.customer_id, o.order_id
+) t
+GROUP BY customer_id;
+-- 32. Display order aging (difference between today and order date).
+-- Use DATEDIFF(CURRENT_DATE, OrderDate).
+
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    DATEDIFF(CURRENT_DATE, order_date) AS order_aging_days
+FROM orders;
+
+-- 33. Identify customers who returned after long gaps between orders.Use LAG() to compare difference between successive order dates.
+
+SELECT
+    customer_id,
+    order_id,
+    order_date,
+    prev_order_date,
+    DATEDIFF(order_date, prev_order_date) AS days_between_orders
+FROM (
+    SELECT
+        customer_id,
+        order_id,
+        order_date,
+        LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date) AS prev_order_date
+    FROM orders
+) t
+WHERE prev_order_date IS NOT NULL
+  AND DATEDIFF(order_date, prev_order_date) > 30  -- >30 days gap, adjust as needed
+ORDER BY customer_id, order_date;
+
+-- 34. Cluster customers into Low / Medium / High spenders. Use CASE WHEN based on total revenue brackets.
+     
+     SELECT
+    c.customer_id,
+    c.Customer_name,
+    total_revenue,
+    CASE
+        WHEN total_revenue <= 5000 THEN 'Low'
+        WHEN total_revenue <= 20000 THEN 'Medium'
+        ELSE 'High'
+    END AS spender_category
+FROM (
+    SELECT
+        o.customer_id,
+        SUM(od.price * od.Quantity * (1 - od.Discount / 100)) AS total_revenue
+    FROM orders o
+    JOIN order_details od ON o.Order_id = od.Order_id
+    GROUP BY o.customer_id
+) AS customer_revenue
+JOIN Customers c ON c.Customer_id = customer_revenue.customer_id
+ORDER BY total_revenue DESC;
+
+
+
+
+
+
+
