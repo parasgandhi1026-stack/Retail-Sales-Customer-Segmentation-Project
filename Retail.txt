@@ -261,23 +261,23 @@ SELECT
     (Price * Quantity * Discount) AS DiscountAmount
 FROM order_details;
 
--- 19. Show the number of orders placed by each customer.
+-- 18. Show the number of orders placed by each customer.
 -- Count orders grouped by CustomerID.
 
 SELECT Customer_id,COUNT(*) AS TotalOrders FROM Orders GROUP BY Customer_id ORDER BY TotalOrders DESC;
 
--- 20. Identify product categories whose revenue exceeded ₹50,000.
+-- 19. Identify product categories whose revenue exceeded ₹50,000.
 -- Sum revenue by category and filter revenues > 50k.
 
 SELECT Category,SUM(Price * Quantity) AS TotalRevenue FROM Order_details GROUP BY Category HAVING TotalRevenue > 50000;
 
--- 21. Display the average discount applied for each product.
+-- 20. Display the average discount applied for each product.
 -- Calculate average discount% grouped by ProductID.
 
 SELECT Product_id,AVG(Discount) AS AverageDiscount FROM Order_details GROUP BY Product_id;
 
 
--- 22. Calculate customer lifetime value (total purchases).
+-- 21. Calculate customer lifetime value (total purchases).
 -- Sum all purchases of every customer up to the current date.
 
 SELECT o.Customer_id,SUM(od.Price * od.Quantity) AS LifetimeValue FROM Orders o JOIN Order_details od ON o.Order_id = od.Order_id
@@ -291,20 +291,20 @@ select * from products;
 select * from order_details;
  
 
--- 23. Find the top-selling product category by total revenue.
+-- 22. Find the top-selling product category by total revenue.
 -- Total revenue = SUM(Price × Quantity) grouped by category; pick highest.
 
 SELECT p.Category,SUM(od.Price * od.Quantity) AS TotalRevenue FROM order_details od JOIN products p
 ON od.product_id = p.product_id GROUP BY p.Category ORDER BY TotalRevenue DESC;
 
 .
--- 24. Find customers with more than 1 order.
+-- 23. Find customers with more than 1 order.
 
 SELECT customer_id,COUNT(order_id) AS total_orders
 FROM orders GROUP BY customer_id HAVING COUNT(order_id) > 1;
 
 
--- 25. Identify high-value customers (total purchase > ₹1,00,000).
+-- 24. Identify high-value customers (total purchase > ₹1,00,000).
 -- Filter customers whose total revenue exceeds ₹1 lakh.
 
 SELECT o.customer_id,SUM(od.price * od.quantity) AS total_revenue
@@ -315,7 +315,7 @@ GROUP BY o.customer_id
 HAVING SUM(od.price * od.quantity) > 100000
 ORDER BY total_revenue DESC;
 
--- 26. Compare sales between 2023 and 2024.
+-- 25. Compare sales between 2023 and 2024.
 -- Compute total revenue for each year and compare.
 
 SELECT YEAR(o.order_date) AS sales_year,SUM(od.price * od.quantity) AS total_revenue
@@ -326,7 +326,7 @@ WHERE YEAR(o.order_date) IN (2023, 2024)
 GROUP BY YEAR(o.order_date)
 ORDER BY sales_year;
 
--- 27. Determine daily, weekly, and monthly sales trends.
+-- 26. Determine daily, weekly, and monthly sales trends.
 
 •	DATE(OrderDate)
 •	WEEK(OrderDate)
@@ -341,7 +341,7 @@ JOIN order_details od
 GROUP BY DATE(o.order_date)
 ORDER BY sale_date;
 
--- 28. Identify slow-moving products (low sales volume).
+-- 27. Identify slow-moving products (low sales volume).
 -- Products with least total quantity sold.
 
 SELECT 
@@ -374,7 +374,7 @@ FROM (
 ) t
 WHERE city_rank <= 3;
 
--- 29. Show top 3 customers in each city using RANK() window function.
+-- 28. Show top 3 customers in each city using RANK() window function.
 -- Rank customers by purchase value within each city.
 SELECT
     city,
@@ -400,7 +400,7 @@ FROM (
 WHERE city_rank <= 3
 ORDER BY city, city_rank;
 
--- 30. Calculate profit per order line:
+-- 29. Calculate profit per order line:
 -- Formula: Profit = Price − (Price × Discount%)
 
 SELECT
@@ -411,7 +411,7 @@ SELECT
     (price - (price * discount)) AS profit
 FROM order_details;
 
--- 31. Calculate average order value (AOV) per customer.
+-- 30. Calculate average order value (AOV) per customer.
 -- Total sales / number of orders for each customer.
 
 SELECT
@@ -428,7 +428,7 @@ FROM (
     GROUP BY o.customer_id, o.order_id
 ) t
 GROUP BY customer_id;
--- 32. Display order aging (difference between today and order date).
+-- 31. Display order aging (difference between today and order date).
 -- Use DATEDIFF(CURRENT_DATE, OrderDate).
 
 SELECT
@@ -438,7 +438,7 @@ SELECT
     DATEDIFF(CURRENT_DATE, order_date) AS order_aging_days
 FROM orders;
 
--- 33. Identify customers who returned after long gaps between orders.Use LAG() to compare difference between successive order dates.
+-- 32. Identify customers who returned after long gaps between orders.Use LAG() to compare difference between successive order dates.
 
 SELECT
     customer_id,
@@ -458,7 +458,7 @@ WHERE prev_order_date IS NOT NULL
   AND DATEDIFF(order_date, prev_order_date) > 30  -- >30 days gap, adjust as needed
 ORDER BY customer_id, order_date;
 
--- 34. Cluster customers into Low / Medium / High spenders. Use CASE WHEN based on total revenue brackets.
+-- 33 . Cluster customers into Low / Medium / High spenders. Use CASE WHEN based on total revenue brackets.
      
      SELECT
     c.customer_id,
